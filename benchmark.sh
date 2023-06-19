@@ -1,7 +1,7 @@
 #!/bin/bash
 avg_time() {
     for file in /usr/bin/*; do
-        { time -p ./ptrace $file &>/dev/null; } 2>&1                                   
+        { time -p ./ptrace $file &>/dev/null; } 2>&1              		
     done | awk '
         /real/ { real = real + $2; nr++ }
         /user/ { user = user + $2; nu++ }
@@ -12,4 +12,12 @@ avg_time() {
                  if (ns>0) printf("sys %f\n",  sys/ns)
                }'
 }
-avg_time
+measure() {
+	for file in /usr/bin/*; do 
+		fsize=$(stat -c%s $file)
+		TIME=$( { time -p ./ptrace $file  > /dev/null; } 2>&1 )
+		time=$(echo $TIME | grep -o '[^[:space:]]*$')
+		echo "$fsize, $time"
+	done
+}
+measure
